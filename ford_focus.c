@@ -108,6 +108,7 @@ int main(){
   //add adges to graph
   add_edge(0, 1, 5, sou_mat);
   add_edge(1, 2, 4, sou_mat);
+  add_edge(0, 2, 4, sou_mat);
 
   int s = 0; //starting point
   int t = 2; //end point
@@ -117,7 +118,7 @@ int main(){
     }
     printf("\n");
   }
-  int a = ford_fulkerson(sou_mat, s, t);
+  int max_flow = ford_fulkerson(sou_mat, s, t);
   for (int i=0; i<SIZE; i++){
     for (int j=0; j<SIZE; j++){
       printf("%d ", sou_mat[SIZE*i+j].flow);
@@ -125,5 +126,5 @@ int main(){
     printf("\n");
   }
   free(sou_mat);
-  printf("Maximální tok je %d.",a);
+  printf("Maximální tok je %d.", max_flow);
 }
