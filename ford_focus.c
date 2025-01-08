@@ -4,7 +4,7 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define SIZE 3
 
-typedef struct{
+typedef struct {
   int max_size;
   int top;
   int* array;
@@ -42,13 +42,13 @@ int pop(Stack *stack){
   return value;
 }
 
-void add_edge(int a, int b, int v, pipe matice_souslednosti[]){
-  matice_souslednosti[SIZE*a+b].max = v;
-  matice_souslednosti[SIZE*b+a].max = v;
-  matice_souslednosti[SIZE*b+a].flow = v;
+void add_edge(int a, int b, int v, pipe sou_mat[]){
+  sou_mat[SIZE*a+b].max = v;
+  sou_mat[SIZE*b+a].max = v;
+  sou_mat[SIZE*b+a].flow = v;
 }
 
-int DFS(int start, int end, pipe matice_souslednosti[], int visited[]){
+int DFS(int start, int end, pipe sou_mat[], int visited[]){
   for (int i=0; i<SIZE; i++){
     visited[i] = -1;
   }
@@ -57,7 +57,7 @@ int DFS(int start, int end, pipe matice_souslednosti[], int visited[]){
   while (stack.top >= 0){
     int v = pop(&stack);
     for (int i=0; i<SIZE; i++){
-      pipe val = matice_souslednosti[SIZE*v+i];
+      pipe val = sou_mat[SIZE*v+i];
       if (visited[i] == -1 && (val.max - val.flow) > 0){
         visited[i] = v;
         push(&stack, i);
@@ -72,26 +72,26 @@ int DFS(int start, int end, pipe matice_souslednosti[], int visited[]){
   return 0;
 }
 
-int ford_fulkerson(pipe matice_souslednosti[], int s, int t){
+int ford_fulkerson(pipe sou_mat[], int s, int t){
   int* visited = (int*) calloc(SIZE*SIZE, sizeof(int));
   int max_flow = 0;
   int curr_flow;
-  while (DFS(s, t, matice_souslednosti, visited)){
+  while (DFS(s, t, sou_mat, visited)){
     curr_flow = 1000000000;
     int i = t;
     int p;
     while (i>=0){
       p = visited[i];
       if (p == -1) break;
-      curr_flow = MIN((matice_souslednosti[SIZE*i+p].flow), curr_flow);
+      curr_flow = MIN((sou_mat[SIZE*i+p].flow), curr_flow);
       i = p;
     }
     i = t;
     while (i>=0){
       p = visited[i];
       if (p == -1) break;
-      matice_souslednosti[SIZE*p+i].flow += curr_flow;
-      matice_souslednosti[SIZE*i+p].flow -= curr_flow;
+      sou_mat[SIZE*p+i].flow += curr_flow;
+      sou_mat[SIZE*i+p].flow -= curr_flow;
       i = p;
     }
     max_flow += curr_flow;
@@ -101,29 +101,29 @@ int ford_fulkerson(pipe matice_souslednosti[], int s, int t){
 }
 
 int main(){
-  pipe* matice_souslednosti = (pipe*) calloc(SIZE*SIZE, sizeof(pipe));
-  if (matice_souslednosti==NULL) exit(0);
+  pipe* sou_mat = (pipe*) calloc(SIZE*SIZE, sizeof(pipe));
+  if (sou_mat==NULL) exit(0);
 
   //add adges to graph
-  add_edge(0, 1, 5, matice_souslednosti);
-  add_edge(1, 2, 4, matice_souslednosti);
-  add_edge(0, 2, 4, matice_souslednosti);
+  add_edge(0, 1, 5, sou_mat);
+  add_edge(1, 2, 4, sou_mat);
+  add_edge(0, 2, 4, sou_mat);
 
   int s = 0; //starting point
   int t = 2; //end point
   for (int i=0; i<SIZE; i++){
     for (int j=0; j<SIZE; j++){
-      printf("%d ", matice_souslednosti[SIZE*i+j].flow);
+      printf("%d ", sou_mat[SIZE*i+j].flow);
     }
     printf("\n");
   }
-  int max_flow = ford_fulkerson(matice_souslednosti, s, t);
+  int max_flow = ford_fulkerson(sou_mat, s, t);
   for (int i=0; i<SIZE; i++){
     for (int j=0; j<SIZE; j++){
-      printf("%d ", matice_souslednosti[SIZE*i+j].flow);
+      printf("%d ", sou_mat[SIZE*i+j].flow);
     }
     printf("\n");
   }
-  free(matice_souslednosti);
+  free(sou_mat);
   printf("Maximální tok je %d.", max_flow);
 }
